@@ -25,7 +25,7 @@ class ServerlessMsgAppStack(Stack):
         # 🔹 Lambda Function (Docker-based)
         lambda_fn = DockerImageFunction(
             self, "MessageProcessorFunction",
-            code=DockerImageCode.from_image_asset(os.path.join(os.getcwd(), "lambda")),
+            code=DockerImageCode.from_image_asset(os.path.join(os.getcwd(), "lambda_fn")),
             environment={
                 "TABLE_NAME": self.table.table_name
             },
