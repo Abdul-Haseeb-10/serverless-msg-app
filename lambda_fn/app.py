@@ -12,16 +12,13 @@ def handler(event, context):
     logger.info(f"Received event: {json.dumps(event)}")
 
     try:
-        # Get table name from environment inside the handler
         table_name = os.environ.get("TABLE_NAME")
         if not table_name:
             raise ValueError("TABLE_NAME environment variable is not set.")
 
-        # ✅ Initialize the DynamoDB resource inside the handler (allows mocking)
         dynamodb = boto3.resource("dynamodb")
         table = dynamodb.Table(table_name)
 
-        # Parse and decode JSON body
         body = event.get("body")
         if isinstance(body, str):
             body = json.loads(body)
@@ -32,19 +29,16 @@ def handler(event, context):
         message_text = body.get("messageText")
         message_datetime = body.get("messageDatetime")
 
-        # Validate messageText
         if not isinstance(message_text, str):
             raise ValueError("messageText must be a string.")
         if not (10 <= len(message_text) <= 100):
             raise ValueError("messageText must be between 10 and 100 characters.")
 
-        # Optional: validate datetime format
         try:
             datetime.strptime(message_datetime, "%Y-%m-%d %H:%M:%S")
         except Exception:
             raise ValueError("messageDatetime must be in YYYY-MM-DD HH:MM:SS format.")
 
-        # Save to DynamoDB
         table.put_item(Item={
             "messageUUID": message_uuid,
             "messageText": message_text,

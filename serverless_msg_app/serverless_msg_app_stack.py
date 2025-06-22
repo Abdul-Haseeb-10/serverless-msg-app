@@ -1,6 +1,5 @@
 from aws_cdk import (
     Stack,
-    aws_lambda as _lambda,
     aws_apigateway as apigw,
     aws_dynamodb as dynamodb,
 )
@@ -8,11 +7,11 @@ from aws_cdk.aws_lambda import DockerImageFunction, DockerImageCode
 from constructs import Construct
 import os
 
-class ServerlessMsgAppStack(Stack):
+class CalabrioApp(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
 
-        # 🔹 DynamoDB Table
+        #  DynamoDB Table
         self.table = dynamodb.Table(
             self, "MessagesTable",
             partition_key=dynamodb.Attribute(
@@ -22,7 +21,7 @@ class ServerlessMsgAppStack(Stack):
             billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST
         )
 
-        # 🔹 Lambda Function (Docker-based)
+        #  Lambda Function
         lambda_fn = DockerImageFunction(
             self, "MessageProcessorFunction",
             code=DockerImageCode.from_image_asset(os.path.join(os.getcwd(), "lambda_fn")),
@@ -31,15 +30,15 @@ class ServerlessMsgAppStack(Stack):
             },
         )
 
-        # 🔹 Grant DynamoDB write access to the Lambda
+        #  Add Permissions
         self.table.grant_write_data(lambda_fn)
-        # 🔹 API Gateway (Invoke Lambda via HTTP)
+        #  API Gateway (Invoke-HTTP)
         api = apigw.LambdaRestApi(
             self, "MessageApi",
             handler=lambda_fn,
             proxy=False
         )
 
-        # Define a POST method on /submit
+        # Configure POST
         messages = api.root.add_resource("submit")
-        messages.add_method("POST")  # POST /submit
+        messages.add_method("POST")
