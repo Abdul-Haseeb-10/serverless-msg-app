@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import os
 import aws_cdk as cdk
-from serverless_msg_app.serverless_msg_app_stack import CalabrioApp
+from calabrio_app.calabrio_app import CalabrioApp
 
 app = cdk.App()
 CalabrioApp(app, "CalabrioApp")
